@@ -7,7 +7,7 @@
 
     <script>
       function calcRmr(age, isMale, weight, height, isDiabetic) {
-        if (age === "" || weight === "" || height === "") {
+        if (age === "" || weight === "" || height === "" || isMale === undefined) {
           return undefined;
         };
         return 71.767
@@ -26,7 +26,6 @@
       function rmrWarnings(age, weight, height) {
         let warnings = [];
         let bmi = calcBmi(weight, height);
-        console.log(bmi);
         if (bmi < 35) {
           warnings.push('BMI under 35 -- this model was validated with BMI 35+ patients only');
         }
@@ -37,8 +36,13 @@
       };
 
       function update() {
+        // Load values
         let age = document.getElementById("age").value;
         let isMale = document.getElementById("male").checked;
+        if (isMale == false && document.getElementById("female").checked == false) {
+          // We haven't selected a gender yet
+          isMale = undefined;
+        }
         let weight = document.getElementById("weight").value;
         let height = document.getElementById("height").value;
         let isDiabetic = document.getElementById("diabetesYes").checked;
@@ -49,7 +53,7 @@
         } else {
           rmr = Math.round(rmr, 0);
         }
-        document.getElementById("result").innerHTML = rmr;
+        document.getElementById("rmr").innerHTML = rmr;
 
         let bmi = calcBmi(weight, height);
         if (bmi === undefined) {
@@ -79,40 +83,55 @@
   <body>
     <div class="container">
       <h1 class="text-center">Resting Metabolic Rate Calculator</h1>
-      <p>Age (years):
-        <input type="number"id="age" onchange="update()" onkeyup="update()">
-      </p>
-      <p>Gender:
-        <input type="radio" name="gender" id="female" onchange="update()" checked="true">
-        <label for="female">Female</label>
+      <form>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input class="form-control" type="number" id="age" onchange="update()" onkeyup="update()" autofocus="true">
+        </div>
+        <div class="form-group">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="gender" id="female" onchange="update()">
+            <label class="form-check-label" for="female">Female</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="gender" id="male" onchange="update()">
+            <label class="form-check-label" for="male">Male</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="weight">Weight (kg)</label>
+          <input class="form-control" type="number" id="weight" onchange="update()" onkeyup="update()">
+        </div>
+        <div class="form-group">
+          <label for="height">Height</label>
+          <input class="form-control" type="number" id="height" onchange="update()" onkeyup="update()">
+        </div>
+        <div class="form-group">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="diabetes" id="diabetesNo" onchange="update()" checked="true">
+            <label class="form-check-label" for="diabetesNo">No diabetes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="diabetes" id="diabetesYes" onchange="update()">
+            <label class="form-check-label" for="diabetesYes">Type 2 diabetes</label>
+          </div>
+        </div>
+      </form>
+      <h4>
+        BMI
+      </h4>
+      <p class="lead" id="bmi"></p>
+      <h4>
+        Resting Metabolic Rate
+      </h4>
+      <p class="lead" id="rmr"></p>
 
-        <input type="radio" name="gender" id="male" onchange="update()">
-        <label for="male">Male</label>
-      </p>
-      <p>Weight (kg):
-        <input type="number" id="weight" onchange="update()" onkeyup="update()">
-      </p>
-      <p>Height (cm):
-        <input type="number" id="height" onchange="update()" onkeyup="update()">
-      </p>
-      <p>Diabetes type 2:
-        <input type="radio" name="diabetes" id="diabetesNo" onchange="update()" checked="true">
-        <label for="diabetesNo">No</label>
-
-        <input type="radio" name="diabetes" id="diabetesYes" onchange="update()">
-        <label for="diabetesYes">Yes</label>
-      </p>
-      <p>
-        BMI: <span id="bmi"></span>
-      <p>
-        Resting Metabolic Rate: <span id="result"></span>
-      </p>
       <div id="warningsContainer">
-        <p>
-          Warnings:
-          <ul id="warnings">
-          </ul>
-        </p>
+        <h4>
+          Warnings
+        </h4>
+        <ul id="warnings">
+        </ul>
       </div>
       <h2>References</h2>
       <p>
@@ -121,6 +140,7 @@
       <p>
         <small>Created by <a href="https://github.com/alexjurkiewicz">Alex Jurkiewicz</a></small>
       </p>
+
     <div>
   </body>
 </html>
