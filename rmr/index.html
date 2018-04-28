@@ -26,11 +26,12 @@
       function rmrWarnings(age, weight, height) {
         let warnings = [];
         let bmi = calcBmi(weight, height);
+        console.log(bmi);
         if (bmi < 35) {
-          warnings.push('BMI under 35');
+          warnings.push('BMI under 35 -- this model was validated with BMI 35+ patients only');
         }
-        if (age <= 18) {
-          warnings.push('Patient is not an adult');
+        if (age !== "" && age < 18) {
+          warnings.push('Patient is not an adult -- this model was validated with adult patients only');
         }
         return warnings;
       };
@@ -68,6 +69,8 @@
             el.appendChild(document.createTextNode(warning));
             list.appendChild(el);
           });
+        } else {
+          document.getElementById("warningsContainer").style.display = "none";
         };
       }
     </script>
@@ -75,7 +78,7 @@
   </head>
   <body>
     <div class="container">
-      <h1>Resting Metabolic Rate Calculator</h1>
+      <h1 class="text-center">Resting Metabolic Rate Calculator</h1>
       <p>Age (years):
         <input type="number"id="age" onchange="update()" onkeyup="update()">
       </p>
