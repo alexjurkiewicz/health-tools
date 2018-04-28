@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+    <script>
+      function calcRmr(age, isMale, weight, height, isDiabetic) {
+        if (age === "" || weight === "" || height === "") {
+          return undefined;
+        };
+        return 71.767
+          - 2.337*age
+          + 257.293*!!isMale
+          + 9.996*weight
+          + 4.132*height
+          + 145.959*!!isDiabetic;
+      };
+
+      function calcBmi(weight, height /* cm, not m! */) {
+        if (weight === "" || height === "") { return undefined; };
+        return weight / Math.pow(height/100, 2);
+      };
+
+      function rmrWarnings(age, weight, height) {
+        let warnings = [];
+        let bmi = calcBmi(weight, height);
+        if (bmi < 35) {
+          warnings.push('BMI under 35');
+        }
+        if (age <= 18) {
+          warnings.push('Patient is not an adult');
+        }
+        return warnings;
+      };
+
+      function update() {
+        let age = document.getElementById("age").value;
+        let isMale = document.getElementById("male").checked;
+        let weight = document.getElementById("weight").value;
+        let height = document.getElementById("height").value;
+        let isDiabetic = document.getElementById("diabetesYes").checked;
+
+        let rmr = calcRmr(age, isMale, weight, height, isDiabetic);
+        if (rmr === undefined) {
+          rmr = "";
+        } else {
+          rmr = Math.round(rmr, 0);
+        }
+        document.getElementById("result").innerHTML = rmr;
+
+        let bmi = calcBmi(weight, height);
+        if (bmi === undefined) {
+          bmi = "";
+        } else {
+          bmi = Math.round(bmi, 1);
+        }
+        document.getElementById("bmi").innerHTML = bmi;
+
+        let warnings = rmrWarnings(age, weight, height);
+        if (warnings.length > 0) {
+          document.getElementById("warningsContainer").style.display = "";
+          let list = document.getElementById("warnings")
+          list.innerHTML = '';
+          warnings.forEach(function(warning) {
+            let el = document.createElement('li');
+            el.appendChild(document.createTextNode(warning));
+            list.appendChild(el);
+          });
+        };
+      }
+    </script>
+
+  </head>
+  <body>
+    <div class="container">
+      <h1>Resting Metabolic Rate Calculator</h1>
+      <p>Age (years):
+        <input type="number"id="age" onchange="update()" onkeyup="update()">
+      </p>
+      <p>Gender:
+        <input type="radio" name="gender" id="female" onchange="update()" checked="true">
+        <label for="female">Female</label>
+
+        <input type="radio" name="gender" id="male" onchange="update()">
+        <label for="male">Male</label>
+      </p>
+      <p>Weight (kg):
+        <input type="number" id="weight" onchange="update()" onkeyup="update()">
+      </p>
+      <p>Height (cm):
+        <input type="number" id="height" onchange="update()" onkeyup="update()">
+      </p>
+      <p>Diabetes type 2:
+        <input type="radio" name="diabetes" id="diabetesNo" onchange="update()" checked="true">
+        <label for="diabetesNo">No</label>
+
+        <input type="radio" name="diabetes" id="diabetesYes" onchange="update()">
+        <label for="diabetesYes">Yes</label>
+      </p>
+      <p>
+        BMI: <span id="bmi"></span>
+      <p>
+        Resting Metabolic Rate: <span id="result"></span>
+      </p>
+      <div id="warningsContainer">
+        <p>
+          Warnings:
+          <ul id="warnings">
+          </ul>
+        </p>
+      </div>
+      <h2>References</h2>
+      <p>
+        Based on research by <a href="https://www.ncbi.nlm.nih.gov/pubmed/15166305">Huang et al</a>.
+      </p>
+      <p>
+        <small>Created by <a href="https://github.com/alexjurkiewicz">Alex Jurkiewicz</a></small>
+      </p>
+    <div>
+  </body>
+</html>
