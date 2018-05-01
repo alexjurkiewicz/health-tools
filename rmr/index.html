@@ -56,29 +56,32 @@
 
         let rmr = calcRmr(age, isMale, weight, height, isDiabetic);
         if (rmr === undefined) {
-          rmr = "unknown";
+          rmr = "need age, weight and height";
         } else {
+          let rmrActivityModified = rmr;
           switch(activityLevel) {
             case "activityLevelSedentary":
-                rmr /= 0.8;
+                rmrActivityModified /= 0.8;
                 break;
             case "activityLevelModerate":
-                rmr /= 0.75;
+                rmrActivityModified /= 0.75;
                 break;
             case "activityLevelActive":
-                rmr /= 0.7;
+                rmrActivityModified /= 0.7;
                 break;
           }
           if (isSignificantWeightLoss === true) {
             rmr *= 0.85;
           }
           rmr = Math.round(rmr, 0);
+          rmrActivityModified = Math.round(rmrActivityModified, 0);
+          rmr = `${rmr} calories per day (${rmrActivityModified} adjusted for activity)`;
         }
-        document.getElementById("rmr").innerHTML = `${rmr} calories per day`;
+        document.getElementById("rmr").innerHTML = rmr;
 
         let bmi = calcBmi(weight, height);
         if (bmi === undefined) {
-          bmi = "unknown";
+          bmi = "need weight and height";
         }
         document.getElementById("bmi").innerHTML = bmi;
 
@@ -109,13 +112,15 @@
         </div>
         <div class="form-group">
           <label for="gender">Gender</label>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="gender" id="female" onchange="update()" checked>
-            <label class="form-check-label" for="female">Female</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="gender" id="male" onchange="update()">
-            <label class="form-check-label" for="male">Male</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="gender" id="female" onchange="update()" checked>
+              <label class="form-check-label" for="female">Female</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="gender" id="male" onchange="update()">
+              <label class="form-check-label" for="male">Male</label>
+            </div>
           </div>
         </div>
         <div class="form-group">
@@ -127,39 +132,46 @@
           <input class="form-control" type="number" id="height" onchange="update()" onkeyup="update()">
         </div>
         <div class="form-group">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="diabetes" id="diabetesNo" onchange="update()" checked>
-            <label class="form-check-label" for="diabetesNo">No diabetes</label>
+          <label for="diabetes">Diabetes</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="diabetes" id="diabetesNo" onchange="update()" checked>
+              <label class="form-check-label" for="diabetesNo">None</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="diabetes" id="diabetesYes" onchange="update()">
+              <label class="form-check-label" for="diabetesYes">Type 2</label>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="diabetes" id="diabetesYes" onchange="update()">
-            <label class="form-check-label" for="diabetesYes">Type 2 diabetes</label>
+        </div>
+        <div class="form-group">
+          <label for="activity">>10% Weight Loss?</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="significantWeightLoss" id="significantWeightLossNo" onchange="update()" checked>
+              <label class="form-check-label" for="diabetesYes">No</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="significantWeightLoss" id="significantWeightLossYes" onchange="update()">
+              <label class="form-check-label" for="diabetesYes">Yes</label>
+            </div>
           </div>
         </div>
         <div class="form-group">
           <label for="activity">Activity Level</label>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelSedentary" onchange="update()" checked>
-            <label class="form-check-label" for="activityLevelSedentary">Sedentary</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelModerate" onchange="update()">
-            <label class="form-check-label" for="activityLevelModerate">Moderate</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelActive" onchange="update()">
-            <label class="form-check-label" for="activityLevelActive">Active</label>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="activity">Significant Weight Loss?</label>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="significantWeightLoss" id="significantWeightLossNo" onchange="update()" checked>
-            <label class="form-check-label" for="diabetesYes">No</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="significantWeightLoss" id="significantWeightLossYes" onchange="update()">
-            <label class="form-check-label" for="diabetesYes">Yes</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelSedentary" onchange="update()" checked>
+              <label class="form-check-label" for="activityLevelSedentary">Sedentary</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelModerate" onchange="update()">
+              <label class="form-check-label" for="activityLevelModerate">Moderate</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelActive" onchange="update()">
+              <label class="form-check-label" for="activityLevelActive">Active</label>
+            </div>
           </div>
         </div>
       </form>
