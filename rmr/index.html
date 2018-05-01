@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Resting Metabolic Rate Calculator</title>
+    <title>Metabolic Rate Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 
     <script>
+      function selectedRadioValue(groupName) {
+        let radios = document.getElementsByName(groupName);
+        for(i = 0; i < radios.length; i++) {
+          if(radios[i].checked) {
+            return radios[i].id;
+          }
+        }
+      }
       function calcRmr(age, isMale, weight, height, isDiabetic) {
         if (age === "" || weight === "" || height === "" || isMale === undefined) {
           return undefined;
@@ -21,17 +29,17 @@
 
       function calcBmi(weight, height /* cm, not m! */) {
         if (weight === "" || height === "") { return undefined; };
-        return weight / Math.pow(height/100, 2);
+        return Math.round(weight / Math.pow(height/100, 2), 1);
       };
 
       function rmrWarnings(age, weight, height) {
         let warnings = [];
         let bmi = calcBmi(weight, height);
         if (bmi < 35) {
-          warnings.push('BMI under 35 -- this model was validated with BMI 35+ patients only');
+          warnings.push('Warning: BMI under 35 -- this model was validated with BMI 35+ patients only');
         }
         if (age !== "" && age < 18) {
-          warnings.push('Patient is not an adult -- this model was validated with adult patients only');
+          warnings.push('Warning: Patient is not an adult -- this model was validated with adult patients only');
         }
         return warnings;
       };
@@ -40,27 +48,37 @@
         // Load values
         let age = document.getElementById("age").value;
         let isMale = document.getElementById("male").checked;
-        if (isMale == false && document.getElementById("female").checked == false) {
-          // We haven't selected a gender yet
-          isMale = undefined;
-        }
         let weight = document.getElementById("weight").value;
         let height = document.getElementById("height").value;
         let isDiabetic = document.getElementById("diabetesYes").checked;
+        let activityLevel = selectedRadioValue("activityLevel");
+        let isSignificantWeightLoss = document.getElementById("significantWeightLossYes").checked;
 
         let rmr = calcRmr(age, isMale, weight, height, isDiabetic);
         if (rmr === undefined) {
-          rmr = "";
+          rmr = "unknown";
         } else {
+          switch(activityLevel) {
+            case "activityLevelSedentary":
+                rmr /= 0.8;
+                break;
+            case "activityLevelModerate":
+                rmr /= 0.75;
+                break;
+            case "activityLevelActive":
+                rmr /= 0.7;
+                break;
+          }
+          if (isSignificantWeightLoss === true) {
+            rmr *= 0.85;
+          }
           rmr = Math.round(rmr, 0);
         }
-        document.getElementById("rmr").innerHTML = rmr;
+        document.getElementById("rmr").innerHTML = `${rmr} calories per day`;
 
         let bmi = calcBmi(weight, height);
         if (bmi === undefined) {
-          bmi = "";
-        } else {
-          bmi = Math.round(bmi, 1);
+          bmi = "unknown";
         }
         document.getElementById("bmi").innerHTML = bmi;
 
@@ -83,18 +101,19 @@
   </head>
   <body>
     <div class="container">
-      <h1 class="text-center">Resting Metabolic Rate Calculator</h1>
+      <h1 class="text-center">Metabolic Rate Calculator</h1>
       <form>
         <div class="form-group">
           <label for="age">Age</label>
           <input class="form-control" type="number" id="age" onchange="update()" onkeyup="update()" autofocus="true">
         </div>
         <div class="form-group">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="gender" id="female" onchange="update()">
+          <label for="gender">Gender</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" id="female" onchange="update()" checked>
             <label class="form-check-label" for="female">Female</label>
           </div>
-          <div class="form-check form-check-inline">
+          <div class="form-check">
             <input class="form-check-input" type="radio" name="gender" id="male" onchange="update()">
             <label class="form-check-label" for="male">Male</label>
           </div>
@@ -109,12 +128,38 @@
         </div>
         <div class="form-group">
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="diabetes" id="diabetesNo" onchange="update()" checked="true">
+            <input class="form-check-input" type="radio" name="diabetes" id="diabetesNo" onchange="update()" checked>
             <label class="form-check-label" for="diabetesNo">No diabetes</label>
           </div>
           <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="diabetes" id="diabetesYes" onchange="update()">
             <label class="form-check-label" for="diabetesYes">Type 2 diabetes</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="activity">Activity Level</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelSedentary" onchange="update()" checked>
+            <label class="form-check-label" for="activityLevelSedentary">Sedentary</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelModerate" onchange="update()">
+            <label class="form-check-label" for="activityLevelModerate">Moderate</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="activityLevel" id="activityLevelActive" onchange="update()">
+            <label class="form-check-label" for="activityLevelActive">Active</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="activity">Significant Weight Loss?</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="significantWeightLoss" id="significantWeightLossNo" onchange="update()" checked>
+            <label class="form-check-label" for="diabetesYes">No</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="significantWeightLoss" id="significantWeightLossYes" onchange="update()">
+            <label class="form-check-label" for="diabetesYes">Yes</label>
           </div>
         </div>
       </form>
@@ -123,14 +168,11 @@
       </h4>
       <p class="lead" id="bmi"></p>
       <h4>
-        Resting Metabolic Rate
+        Calculated Metabolic Rate
       </h4>
       <p class="lead" id="rmr"></p>
 
       <div id="warningsContainer" style="display: none;">
-        <h4>
-          Warnings
-        </h4>
         <ul id="warnings">
         </ul>
       </div>
