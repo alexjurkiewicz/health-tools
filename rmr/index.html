@@ -79,10 +79,11 @@
         }
         document.getElementById("rmr").innerHTML = rmr;
 
-        let bmi = Math.round(calcBmi(weight, height), 2);
-        if (bmi === undefined) {
+        let bmi = Math.round(calcBmi(weight, height) * 100) / 100;
+        if (bmi === undefined || bmi === NaN) {
           bmi = "need weight and height";
         }
+        console.log(bmi);
         document.getElementById("bmi").innerHTML = bmi;
 
         let warnings = rmrWarnings(age, weight, height);
