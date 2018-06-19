@@ -29,7 +29,7 @@
 
       function calcBmi(weight, height /* cm, not m! */) {
         if (weight === "" || height === "") { return undefined; };
-        return Math.round(weight / Math.pow(height/100, 2), 1);
+        return Math.round(weight / Math.pow(height/100, 2), 2);
       };
 
       function rmrWarnings(age, weight, height) {
